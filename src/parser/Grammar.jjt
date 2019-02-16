@@ -1,0 +1,178 @@
+PARSER_BEGIN(PatinaParser)
+
+package parser;
+
+import java.io.StringReader;
+import java.io.Reader;
+import java.util.LinkedList;
+
+public class PatinaParser
+{
+}
+PARSER_END(PatinaParser)
+
+/* Special tokens are ignored by the parser, but can still be recovered during parsing if necessary. */
+SPECIAL_TOKEN :
+{
+    < WHITESPACE : (["\n", "\r", "\t", " "])+ >
+|   < SINGLE_LINE_COMMENT : "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n") >
+}
+
+TOKEN : /* KEYWORDS */
+{
+    < BE : "be" >
+|   < FALSE : "false" >
+|   < FN : "fn" >
+|   < IF: "if" >
+|   < LET : "let" >
+|   < MUT : "mut" >
+|   < RETURN : "return" >
+|   < SET: "set" >
+|   < TRUE : "true" >
+|   < WHILE : "while" >
+}
+
+TOKEN : /* SYMBOLS */
+{
+    < LARROW : "<-" >
+|   < RARROW : "->" >
+
+|   < LPAR : "(" >
+|   < RPAR : ")" >
+|   < LCBR : "{" >
+|   < RCBR : "}" >
+|   < LSBR : "[" >
+|   < RSBR : "]" >
+|   < LABR : "<" >
+|   < RABR : ">" >
+
+|   < COLON : ":" >
+|   < COMMA : "," >
+|   < PERIOD : "." >
+
+|   < PLUS : "+" >
+|   < MINUS : "-" >
+|   < MULT : "*" >
+|   < DIV : "/" >
+|   < MOD : "%" >
+
+|   < AMP : "&" >
+|   < CARET : "^" >
+|   < EXCLAMATION : "!" >
+|   < PIPE : "|" >
+|   < SHIFTL : "<<" >
+|   < SHIFTR : ">>" >
+
+|   < EQ : "=" >
+|   < LEQ : "<=" >
+|   < GEQ : ">=" >
+|   < NEQ : "!=" >
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+    < IDENTIFIER : <LETTER> (<LETTER>|<DIGIT>)* >
+|   < #LETTER : ["_","a"-"z","A"-"Z"] >
+|   < #DIGIT : ["0"-"9"] >
+}
+
+TOKEN : /* LITERALS */
+{
+        < INTEGER_LITERAL :  (<DIGIT>)+ >
+   |    < FLOATING_LITERAL : <INTEGER_LITERAL> "." <INTEGER_LITERAL> >
+}
+
+void BooleanLiteral() :
+{}
+{
+    <TRUE>
+|   <FALSE>
+}
+
+/* Top-level production */
+LinkedList<TypeCheckable> Input() :
+{
+    Statement s;
+    LinkedList<TypeCheckable> result = new LinkedList<TypeCheckable>();
+}
+{
+    (Statement())+ <EOF>
+}
+
+void Statement() :
+{
+    Assignment a;
+    Declaration d;
+    IExpression e;
+}
+{
+    (Expression() | Assignment()) <PERIOD>
+    (
+          LOOKAHEAD(3)
+                    d = Declaration() <PERIOD> { result.add(d); }
+                |   a = Assignment()  <PERIOD> { result.add(a); }
+                |   e = Expression()  <PERIOD> { result.add(e); }
+        )+
+        <EOF>
+        { return result; }
+}
+
+IExpression Expression() :
+{
+    IExpression result, b;
+}
+{
+    result = UnaryExpression()
+    (
+        (<PLUS> | <MINUS> | <MULT> | <DIV> | <MOD>)
+        b = UnaryExpression()
+        { result = new Mult(result, b); }
+    )*
+    { return result; }
+}
+
+void Declaration() :
+{}
+{
+    ImmutableDeclaration()
+|   MutableDeclaration()
+}
+
+void ImmutableDeclaration() :
+{}
+{
+    <LET> <IDENTIFIER> <BE> Type() <LARROW> Expression()
+}
+
+void MutableDeclaration() :
+{}
+{
+    <LET> <IDENTIFIER> <BE> Type() <MUT> (<LARROW> Expression())?
+}
+
+void Assignment() :
+{}
+{
+    <SET> <IDENTIFIER> <LARROW> Expression()
+}
+
+/*void FunctionDeclaration() :
+{}
+{
+    <LET> <IDENTIFIER>
+}*/
+
+void UnaryExpression() :
+{}
+{
+    <INTEGER_LITERAL>
+|   <FLOATING_LITERAL>
+|   <IDENTIFIER>
+|   BooleanLiteral()
+}
+
+void Type() :
+{}
+{
+    <IDENTIFIER>
+}
