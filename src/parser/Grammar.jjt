@@ -176,3 +176,22 @@ void Type() :
 {
     <IDENTIFIER>
 }
+
+void Condition():
+{}
+{
+    BooleanLiteral()
+|   Expression() <LABR> Expression()
+|   Expression() <RABR> Expression()
+|   Expression() <EQ> Expression()
+|   Expression() <LEQ> Expression()
+|   Expression() <REQ> Expression()
+|   Expression() <NEQ> Expression()
+}
+
+void Loop():
+{}
+{
+    <WHILE> Condition() Statement()        
+    //was looking through an example file in the javacc download and it looked like it was as simple as this to make a while loop
+}
