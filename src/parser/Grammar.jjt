@@ -189,9 +189,11 @@ void Condition():
 |   Expression() <NEQ> Expression()
 }
 
-void Loop():
-{}
+LinkedList<Node> Loop():
 {
-    <WHILE> Condition() Statement()        
+    LinkedList<Node> result = new LinkedList<Node>();
+}
+{
+    <WHILE> Condition() <LCBR> Statement() <RCBR>       
     //was looking through an example file in the javacc download and it looked like it was as simple as this to make a while loop
 }
