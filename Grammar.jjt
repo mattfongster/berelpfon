@@ -1,0 +1,192 @@
+PARSER_BEGIN(PatinaParser)
+
+package parser;
+
+import ast.Assignment;
+import ast.Declaration;
+import ast.Bool;
+import ast.Flt;
+import ast.IExpression;
+import ast.Identifier;
+import ast.Int;
+import ast.Mult;
+import ast.TypeCheckable;
+import java.util.LinkedList;
+
+public class PatinaParser
+{
+}
+PARSER_END(PatinaParser)
+
+/* Special tokens are ignored by the parser, but can still be recovered during parsing if necessary. */
+SPECIAL_TOKEN :
+{
+    < WHITESPACE : (["\n", "\r", "\t", " "])+ >
+|   < SINGLE_LINE_COMMENT : "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n") >
+}
+
+TOKEN : /* KEYWORDS */
+{
+    < BE : "be" >
+|   < FALSE : "false" >
+|   < FN : "fn" >
+|   < IF: "if" >
+|   < LET : "let" >
+|   < MUT : "mut" >
+|   < RETURN : "return" >
+|   < SET: "set" >
+|   < TRUE : "true" >
+|   < WHILE : "while" >
+}
+
+TOKEN : /* SYMBOLS */
+{
+    < LARROW : "<-" >
+|   < RARROW : "->" >
+
+|   < LPAR : "(" >
+|   < RPAR : ")" >
+|   < LCBR : "{" >
+|   < RCBR : "}" >
+|   < LSBR : "[" >
+|   < RSBR : "]" >
+|   < LABR : "<" >
+|   < RABR : ">" >
+
+|   < COLON : ":" >
+|   < COMMA : "," >
+|   < PERIOD : "." >
+
+|   < PLUS : "+" >
+|   < MINUS : "-" >
+|   < MULT : "*" >
+|   < DIV : "/" >
+|   < MOD : "%" >
+
+|   < AMP : "&" >
+|   < CARET : "^" >
+|   < EXCLAMATION : "!" >
+|   < PIPE : "|" >
+|   < SHIFTL : "<<" >
+|   < SHIFTR : ">>" >
+
+|   < EQ : "=" >
+|   < LEQ : "<=" >
+|   < GEQ : ">=" >
+|   < NEQ : "!=" >
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+    < IDENTIFIER : <LETTER> (<LETTER>|<DIGIT>)* >
+|   < #LETTER : ["_","a"-"z","A"-"Z"] >
+|   < #DIGIT : ["0"-"9"] >
+}
+
+TOKEN : /* LITERALS */
+{
+        < INTEGER_LITERAL :  (<DIGIT>)+ >
+   |    < FLOATING_LITERAL : <INTEGER_LITERAL> "." <INTEGER_LITERAL> >
+}
+
+
+/* Top-level production */
+LinkedList<TypeCheckable> Input() :
+{
+    TypeCheckable a, d;
+    IExpression e;
+    LinkedList<TypeCheckable> result = new LinkedList<TypeCheckable>();
+}
+{
+        (
+        LOOKAHEAD(3)
+            d = Declaration() <PERIOD> { result.add(d); }
+        |
+            LOOKAHEAD(3)   
+            a = Assignment()  <PERIOD> { result.add(a); }
+        |
+            LOOKAHEAD(3)
+            e = Expression()  <PERIOD> { result.add(e); }
+        )+
+        <EOF>
+        { return result; }
+}
+
+TypeCheckable Declaration() :
+{
+    TypeCheckable id, md;
+}
+{
+    (
+    LOOKAHEAD(3)
+        id = ImmutableDeclaration() { return id; }
+    |   md = MutableDeclaration() { return md; }
+    )
+}
+
+TypeCheckable ImmutableDeclaration() : // must be an assignment
+{
+	Token t;
+	IExpression e;
+}
+{
+    t = <LET> <IDENTIFIER> <BE> Type() <LARROW> e = Expression()
+    { return new Assignment(new Identifier(t.image), e); }
+}
+
+TypeCheckable MutableDeclaration() : // does not need to be assigned anything
+{
+    Token t;
+}
+{
+    t = <LET> <IDENTIFIER> <BE> Type() <MUT> (<LARROW> Expression())?
+    { return new Declaration(t.image); }
+}
+
+/*void FunctionDeclaration() :
+{}
+{
+    <LET> <IDENTIFIER>
+}*/
+
+IExpression Expression() :
+{
+    IExpression result, b;
+}
+{
+    result = UnaryExpression() // renamed atomic expression
+    (
+        (<PLUS> | <MINUS> | <MULT> | <DIV> | <MOD>)
+        b = UnaryExpression()
+        { result = new Mult(result, b); }
+    )*
+    { return result; }
+}
+
+IExpression UnaryExpression() :
+{
+    Token t;
+}
+{
+    t = <INTEGER_LITERAL> { return new Int(Integer.parseInt(t.image)); }
+|   t = <FLOATING_LITERAL> { return new Flt(Float.parseFloat(t.image)); }
+|   t = <IDENTIFIER> { return new Identifier(t.image); }
+|   <TRUE> { return new Bool(true); }
+|   <FALSE> { return new Bool(false); }
+}
+
+void Type() :
+{}
+{
+    <IDENTIFIER>
+}
+
+Assignment Assignment() :
+{
+    Token t;
+    IExpression rhs;
+}
+{
+    t = <IDENTIFIER> <LARROW> rhs = Expression() // assign equals
+    { return new Assignment(new Identifier(t.image), rhs); }
+}
