@@ -109,7 +109,7 @@ LinkedList<TypeCheckable> Input() :
         try {
 /*@egen*/
         (
-        LOOKAHEAD(3)
+            LOOKAHEAD(5)
             d = Declaration() <PERIOD> { result.add(d); }
         |
             LOOKAHEAD(3)   
@@ -159,18 +159,18 @@ TypeCheckable Declaration() :
     try {
 /*@egen*/
     (
-    LOOKAHEAD(3)
-        id = ImmutableDeclaration()/*@bgen(jjtree)*/
-                                    {
-                                      jjtree.closeNodeScope(jjtn000, true);
-                                      jjtc000 = false;
-                                    }
-/*@egen*/ { return id; }
-    |   md = MutableDeclaration()/*@bgen(jjtree)*/
+    LOOKAHEAD(5)
+      id = ImmutableDeclaration()/*@bgen(jjtree)*/
                                   {
                                     jjtree.closeNodeScope(jjtn000, true);
                                     jjtc000 = false;
                                   }
+/*@egen*/ { return id; }
+    | md = MutableDeclaration()/*@bgen(jjtree)*/
+                                {
+                                  jjtree.closeNodeScope(jjtn000, true);
+                                  jjtc000 = false;
+                                }
 /*@egen*/ { return md; }
     )/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
@@ -197,12 +197,12 @@ TypeCheckable Declaration() :
 
 TypeCheckable ImmutableDeclaration() : // must be an assignment
 {/*@bgen(jjtree) ImmutableDeclaration */
-        SimpleNode jjtn000 = new SimpleNode(JJTIMMUTABLEDECLARATION);
-        boolean jjtc000 = true;
-        jjtree.openNodeScope(jjtn000);
+    SimpleNode jjtn000 = new SimpleNode(JJTIMMUTABLEDECLARATION);
+    boolean jjtc000 = true;
+    jjtree.openNodeScope(jjtn000);
 /*@egen*/
-	Token t;
-	IExpression e;
+    Token t;
+    IExpression e;
 }
 {/*@bgen(jjtree) ImmutableDeclaration */
     try {

@@ -99,7 +99,7 @@ LinkedList<TypeCheckable> Input() :
 }
 {
         (
-        LOOKAHEAD(3)
+            LOOKAHEAD(5)
             d = Declaration() <PERIOD> { result.add(d); }
         |
             LOOKAHEAD(3)   
@@ -118,16 +118,16 @@ TypeCheckable Declaration() :
 }
 {
     (
-    LOOKAHEAD(3)
-        id = ImmutableDeclaration() { return id; }
-    |   md = MutableDeclaration() { return md; }
+    LOOKAHEAD(5)
+      id = ImmutableDeclaration() { return id; }
+    | md = MutableDeclaration() { return md; }
     )
 }
 
 TypeCheckable ImmutableDeclaration() : // must be an assignment
 {
-	Token t;
-	IExpression e;
+    Token t;
+    IExpression e;
 }
 {
     t = <LET> <IDENTIFIER> <BE> Type() <LARROW> e = Expression()

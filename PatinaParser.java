@@ -21,7 +21,7 @@ public class PatinaParser implements PatinaParserConstants {
     LinkedList<TypeCheckable> result = new LinkedList<TypeCheckable>();
     label_1:
     while (true) {
-      if (jj_2_1(3)) {
+      if (jj_2_1(5)) {
         d = Declaration();
         jj_consume_token(PERIOD);
 result.add(d);
@@ -58,7 +58,7 @@ result.add(e);
   }
 
   static final public TypeCheckable Declaration() throws ParseException {TypeCheckable id, md;
-    if (jj_2_4(3)) {
+    if (jj_2_4(5)) {
       id = ImmutableDeclaration();
 {if ("" != null) return id;}
     } else {
@@ -78,7 +78,7 @@ result.add(e);
   }
 
   static final public TypeCheckable ImmutableDeclaration() throws ParseException {Token t;
-        IExpression e;
+    IExpression e;
     t = jj_consume_token(LET);
     jj_consume_token(IDENTIFIER);
     jj_consume_token(BE);
@@ -245,15 +245,19 @@ result = new Mult(result, b);
     finally { jj_save(3, xla); }
   }
 
-  static private boolean jj_3R_15()
+  static private boolean jj_3R_6()
  {
-    if (jj_scan_token(FALSE)) return true;
+    if (jj_scan_token(LET)) return true;
+    if (jj_scan_token(IDENTIFIER)) return true;
+    if (jj_scan_token(BE)) return true;
+    if (jj_scan_token(41)) return true;
+    if (jj_scan_token(LARROW)) return true;
     return false;
   }
 
-  static private boolean jj_3_1()
+  static private boolean jj_3R_15()
  {
-    if (jj_3R_3()) return true;
+    if (jj_scan_token(FALSE)) return true;
     return false;
   }
 
@@ -281,12 +285,6 @@ result = new Mult(result, b);
     return false;
   }
 
-  static private boolean jj_3R_11()
- {
-    if (jj_scan_token(INTEGER_LITERAL)) return true;
-    return false;
-  }
-
   static private boolean jj_3R_8()
  {
     Token xsp;
@@ -307,17 +305,15 @@ result = new Mult(result, b);
     return false;
   }
 
-  static private boolean jj_3_4()
+  static private boolean jj_3R_11()
  {
-    if (jj_3R_6()) return true;
+    if (jj_scan_token(INTEGER_LITERAL)) return true;
     return false;
   }
 
-  static private boolean jj_3R_4()
+  static private boolean jj_3_4()
  {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    if (jj_scan_token(LARROW)) return true;
-    if (jj_3R_5()) return true;
+    if (jj_3R_6()) return true;
     return false;
   }
 
@@ -332,11 +328,10 @@ result = new Mult(result, b);
     return false;
   }
 
-  static private boolean jj_3R_10()
+  static private boolean jj_3_3()
  {
-    if (jj_scan_token(LET)) return true;
-    if (jj_scan_token(IDENTIFIER)) return true;
-    if (jj_scan_token(BE)) return true;
+    if (jj_3R_5()) return true;
+    if (jj_scan_token(PERIOD)) return true;
     return false;
   }
 
@@ -361,16 +356,15 @@ result = new Mult(result, b);
     return false;
   }
 
-  static private boolean jj_3_3()
- {
-    if (jj_3R_5()) return true;
-    if (jj_scan_token(PERIOD)) return true;
-    return false;
-  }
-
   static private boolean jj_3_2()
  {
     if (jj_3R_4()) return true;
+    return false;
+  }
+
+  static private boolean jj_3_1()
+ {
+    if (jj_3R_3()) return true;
     return false;
   }
 
@@ -385,11 +379,21 @@ result = new Mult(result, b);
     return false;
   }
 
-  static private boolean jj_3R_6()
+  static private boolean jj_3R_4()
+ {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    if (jj_scan_token(LARROW)) return true;
+    if (jj_3R_5()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_10()
  {
     if (jj_scan_token(LET)) return true;
     if (jj_scan_token(IDENTIFIER)) return true;
     if (jj_scan_token(BE)) return true;
+    if (jj_scan_token(41)) return true;
+    if (jj_scan_token(MUT)) return true;
     return false;
   }
 
